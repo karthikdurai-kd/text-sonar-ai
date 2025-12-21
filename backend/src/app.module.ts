@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -41,6 +42,9 @@ import { AppService } from './app.service';
       }),
       inject: [ConfigService],
     }),
+
+    // Feature modules
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
