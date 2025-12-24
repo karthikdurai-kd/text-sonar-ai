@@ -5,6 +5,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DocumentsModule } from './documents/documents.module';
+import { ProcessorsModule } from './processors/processors.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { DocumentsModule } from './documents/documents.module';
 
     // Feature modules
     DocumentsModule,
+    ProcessorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
