@@ -5,6 +5,7 @@ import { PdfProcessor } from './pdf.processor';
 import { Document } from '../entities/document.entity';
 import { DocumentsModule } from '../documents/documents.module';
 import { Chunk } from '../entities/chunk.entity';
+import { ServicesModule } from '../services/services.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Chunk } from '../entities/chunk.entity';
       name: 'pdf-processing',
     }),
     DocumentsModule,
+    ServicesModule,
   ],
   providers: [PdfProcessor],
 })

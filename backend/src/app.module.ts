@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DocumentsModule } from './documents/documents.module';
 import { ProcessorsModule } from './processors/processors.module';
+import { ServicesModule } from './services/services.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ProcessorsModule } from './processors/processors.module';
     }),
 
     // Feature modules
+    ServicesModule,
     DocumentsModule,
     ProcessorsModule,
   ],

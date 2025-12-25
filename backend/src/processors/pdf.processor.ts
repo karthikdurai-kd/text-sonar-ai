@@ -8,6 +8,8 @@ import { Chunk } from '../entities/chunk.entity';
 import { DocumentsService } from '../documents/documents.service';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+import { EmbeddingsService } from '../services/embeddings.service';
+import { PineconeService } from '../services/pinecone.service';
 
 interface PdfProcessingJob {
   documentId: string;
@@ -36,11 +38,12 @@ export class PdfProcessor extends WorkerHost {
     @InjectRepository(Chunk)
     private chunkRepository: Repository<Chunk>,
     private documentsService: DocumentsService,
+    private embeddingsService: EmbeddingsService,
+    private pineconeService: PineconeService,
   ) {
     super();
   }
 
-  // Process PDF file
   async process(job: Job<PdfProcessingJob>): Promise<void> {
     const { documentId, filePath } = job.data;
     this.logger.log(`Processing PDF: ${documentId}`);
@@ -95,14 +98,14 @@ export class PdfProcessor extends WorkerHost {
         `Filtered to ${meaningfulChunks.length} meaningful chunks (removed ${splitDocs.length - meaningfulChunks.length} invalid)`,
       );
 
-      // 3: Remove duplicate chunks (exact text matches)
+      // 3: Remove duplicate chunks
       const uniqueChunks = this.removeDuplicates(meaningfulChunks);
 
       this.logger.log(
         `Removed ${meaningfulChunks.length - uniqueChunks.length} duplicate chunks`,
       );
 
-      // 4: Create entities
+      // 4: Create chunk entities and save to database
       const chunkEntities = uniqueChunks.map((splitDoc, index) => {
         const pageNumber = splitDoc.metadata?.loc?.pageNumber;
         return this.chunkRepository.create({
@@ -113,8 +116,40 @@ export class PdfProcessor extends WorkerHost {
         });
       });
 
-      await this.chunkRepository.save(chunkEntities);
+      const savedChunks = await this.chunkRepository.save(chunkEntities);
+      this.logger.log(`Saved ${savedChunks.length} chunks to database`);
 
+      // 5: Generate embeddings for all chunks
+      const chunkTexts = savedChunks.map((chunk) => chunk.text);
+      this.logger.log(`Generating embeddings for ${chunkTexts.length} chunks`);
+
+      const embeddings =
+        await this.embeddingsService.embedDocuments(chunkTexts);
+      this.logger.log(`Generated ${embeddings.length} embeddings`);
+
+      // 6: Prepare vectors for Pinecone
+      const vectors = savedChunks.map((chunk, index) => ({
+        id: `chunk_${chunk.id}`,
+        values: embeddings[index],
+        metadata: {
+          chunkId: chunk.id,
+          documentId: chunk.documentId,
+          page: chunk.page,
+          text: chunk.text.substring(0, 500),
+        },
+      }));
+
+      // 7: Upsert vectors to Pinecone
+      await this.pineconeService.upsertVectors(vectors);
+      this.logger.log(`Upserted ${vectors.length} vectors to Pinecone`);
+
+      // 8: Update chunks with vector IDs
+      for (let i = 0; i < savedChunks.length; i++) {
+        savedChunks[i].vectorId = vectors[i].id;
+      }
+      await this.chunkRepository.save(savedChunks);
+
+      // 9: Update document status
       await this.documentRepository.update(documentId, {
         status: DocumentStatus.COMPLETED,
         totalPages: numPages,
@@ -122,7 +157,7 @@ export class PdfProcessor extends WorkerHost {
       });
 
       this.logger.log(
-        `PDF processing completed: ${documentId} - Saved ${uniqueChunks.length} chunks`,
+        `PDF processing completed: ${documentId} - Saved ${uniqueChunks.length} chunks with embeddings`,
       );
     } catch (error) {
       this.logger.error(`Error processing PDF ${documentId}:`, error);
@@ -136,18 +171,9 @@ export class PdfProcessor extends WorkerHost {
   }
 
   // *** Helper functions *** //
-
-  // normalize PDF text by replacing newlines with spaces and multiple spaces with single space
+  // normalize text by replacing newlines with spaces and multiple spaces with single space
   private normalizeText(text: string): string {
-    return (
-      text
-        // Replace all newlines with spaces
-        .replace(/\n+/g, ' ')
-        // Replace multiple spaces/tabs with single space
-        .replace(/\s+/g, ' ')
-        // Remove leading/trailing whitespace
-        .trim()
-    );
+    return text.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   // clean chunk text by removing trailing page numbers, leading punctuation, and normalizing whitespace
@@ -158,9 +184,9 @@ export class PdfProcessor extends WorkerHost {
         .replace(/\s+\d+\s*$/gm, '')
         // Remove leading punctuation (periods, commas, etc.)
         .replace(/^[.,;:!?\s]+/g, '')
-        // Normalize whitespace again (in case cleaning added issues)
+        // Normalize whitespace (multiple spaces to single space)
         .replace(/\s+/g, ' ')
-        // Remove leading/trailing whitespace
+        // Trim whitespace
         .trim()
     );
   }

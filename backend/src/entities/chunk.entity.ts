@@ -35,6 +35,9 @@ export class Chunk {
   @Column({ type: 'int', nullable: true })
   endCharIndex: number;
 
+  @Column({ nullable: true })
+  vectorId: string;
+
   @CreateDateColumn()
   createdAt: Date;
 }
