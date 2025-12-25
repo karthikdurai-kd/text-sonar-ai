@@ -16,20 +16,20 @@ export class Chat {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ name: 'document_id' })
   documentId: string;
 
   @ManyToOne(() => Document, (document) => document.chats)
-  @JoinColumn({ name: 'documentId' })
+  @JoinColumn({ name: 'document_id' })
   document: Document;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'title' })
   title: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @OneToMany(() => Message, (message) => message.chat, { cascade: true })

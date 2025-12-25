@@ -20,41 +20,42 @@ export class Document {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ name: 'filename' })
   filename: string;
 
-  @Column()
+  @Column({ name: 'original_name' })
   originalName: string;
 
-  @Column()
+  @Column({ name: 'mime_type' })
   mimeType: string;
 
-  @Column('bigint')
+  @Column({ type: 'bigint', name: 'size' })
   size: number;
 
-  @Column()
+  @Column({ name: 'file_path' })
   filePath: string;
 
   @Column({
     type: 'enum',
     enum: DocumentStatus,
     default: DocumentStatus.PENDING,
+    name: 'status',
   })
   status: DocumentStatus;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'error_message' })
   errorMessage: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, name: 'total_pages' })
   totalPages: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, name: 'total_chunks' })
   totalChunks: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @OneToMany(() => Chat, (chat) => chat.document)

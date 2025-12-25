@@ -18,29 +18,30 @@ export class Message {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ name: 'chat_id' })
   chatId: string;
 
   @ManyToOne(() => Chat, (chat) => chat.messages)
-  @JoinColumn({ name: 'chatId' })
+  @JoinColumn({ name: 'chat_id' })
   chat: Chat;
 
   @Column({
     type: 'enum',
     enum: MessageRole,
+    name: 'role',
   })
   role: MessageRole;
 
-  @Column('text')
+  @Column({ type: 'text', name: 'content' })
   content: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('jsonb', { nullable: true, name: 'citations' })
   citations: Array<{
     page: number;
     text: string;
     score?: number;
   }>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
