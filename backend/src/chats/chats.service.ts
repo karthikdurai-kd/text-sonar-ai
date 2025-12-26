@@ -5,8 +5,6 @@ import { Chat } from '../entities/chat.entity';
 import { Message, MessageRole } from '../entities/message.entity';
 import { Document } from '../entities/document.entity';
 import { RagService } from '../services/rag.service';
-import { EmbeddingsService } from '../services/embeddings.service';
-import { PineconeService } from '../services/pinecone.service';
 
 type Citation = {
   page: number;
@@ -24,8 +22,6 @@ export class ChatsService {
     @InjectRepository(Document)
     private documentRepository: Repository<Document>,
     private ragService: RagService,
-    private embeddingsService: EmbeddingsService,
-    private pineconeService: PineconeService,
   ) {}
 
   // create a new chat for a document
@@ -126,28 +122,25 @@ export class ChatsService {
     let fullAnswer = '';
     let citations: Citation[] = [];
 
-    // Stream answer from RAG service
-    for await (const chunk of this.ragService.streamAnswer(
+    // get the stream generator response
+    const streamGenerator = this.ragService.streamAnswer(
       question,
       chat.documentId,
-    )) {
+    );
+
+    // Iterate through the stream
+    while (true) {
+      const result = await streamGenerator.next();
+
+      if (result.done) {
+        citations = result.value?.citations || [];
+        break;
+      }
+
+      const chunk = result.value;
       fullAnswer += chunk;
       yield chunk;
     }
-
-    // Get citations
-    const questionEmbedding = await this.embeddingsService.embedText(question);
-    const similarChunks = await this.pineconeService.querySimilar(
-      questionEmbedding,
-      5,
-      { documentId: chat.documentId },
-    );
-
-    citations = similarChunks.map((chunk) => ({
-      page: Number(chunk.metadata?.page) || 1,
-      text: String(chunk.metadata?.text || ''),
-      score: chunk.score,
-    }));
 
     // Save assistant message
     const assistantMessage = this.messageRepository.create({

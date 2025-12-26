@@ -7,6 +7,17 @@ import { EmbeddingsService } from './embeddings.service';
 import { PineconeService } from './pinecone.service';
 import { Chunk } from '../entities/chunk.entity';
 
+type Citation = {
+  page: number;
+  text: string;
+  score?: number;
+};
+
+type RAGContext = {
+  context: string;
+  citations: Citation[];
+};
+
 @Injectable()
 export class RagService {
   private readonly logger = new Logger(RagService.name);
@@ -34,19 +45,92 @@ export class RagService {
     this.logger.log('RAG Service initialized with GPT-4o');
   }
 
-  // generate answer using RAG (Retrieval-Augmented Generation)
+  /// ********** PUBLIC METHODS **********
+
+  // generate answer using RAG - non-streaming
   async generateAnswer(
     question: string,
     documentId: string,
     topK: number = 5,
   ): Promise<{
     answer: string;
-    citations: Array<{
-      page: number;
-      text: string;
-      score?: number;
-    }>;
+    citations: Citation[];
   }> {
+    // Retrieve context and citations (shared logic)
+    const { context, citations } = await this.retrieveContext(
+      question,
+      documentId,
+      topK,
+    );
+
+    if (context === '') {
+      return {
+        answer:
+          "I couldn't find relevant information in the document to answer your question.",
+        citations: [],
+      };
+    }
+
+    // Build prompt
+    const prompt = this.buildPrompt(context, question);
+
+    // Generate answer with GPT-4o
+    this.logger.log('Generating answer with GPT-4o');
+    const response = await this.llm.invoke(prompt);
+    const answer = response.content as string;
+
+    this.logger.log('Answer generated successfully');
+
+    return {
+      answer,
+      citations,
+    };
+  }
+
+  // stream answer generation - streaming
+  async *streamAnswer(
+    question: string,
+    documentId: string,
+    topK: number = 5,
+  ): AsyncGenerator<string, { citations: Citation[] }, unknown> {
+    // retrieve context and citations
+    const { context, citations } = await this.retrieveContext(
+      question,
+      documentId,
+      topK,
+    );
+
+    if (context === '') {
+      yield "I couldn't find relevant information in the document to answer your question.";
+      return { citations: [] };
+    }
+
+    // build prompt
+    const prompt = this.buildPrompt(context, question);
+
+    // stream response from GPT-4o
+    this.logger.log('Streaming answer with GPT-4o');
+    const stream = await this.llm.stream(prompt);
+
+    for await (const chunk of stream) {
+      const content = chunk.content as string;
+      if (content) {
+        yield content;
+      }
+    }
+
+    // return citations at the end
+    return { citations };
+  }
+
+  /// ********** HELPER METHODS **********
+
+  // retrieve context and citations
+  private async retrieveContext(
+    question: string,
+    documentId: string,
+    topK: number = 5,
+  ): Promise<RAGContext> {
     // 1. Convert question to embedding
     this.logger.log(`Generating embedding for question: "${question}"`);
     const questionEmbedding = await this.embeddingsService.embedText(question);
@@ -61,8 +145,7 @@ export class RagService {
 
     if (similarChunks.length === 0) {
       return {
-        answer:
-          "I couldn't find relevant information in the document to answer your question.",
+        context: '',
         citations: [],
       };
     }
@@ -106,8 +189,15 @@ export class RagService {
       };
     });
 
-    // 6. Build prompt
-    const prompt = `You are a helpful assistant that answers questions based on the provided context from a document.
+    return {
+      context,
+      citations,
+    };
+  }
+
+  // build prompt with context and question
+  private buildPrompt(context: string, question: string): string {
+    return `You are a helpful assistant that answers questions based on the provided context from a document.
 
     Context from document:
     ${context}
@@ -124,73 +214,5 @@ export class RagService {
     7. ONLY say "I couldn't find relevant information" if the context contains ZERO mention of the topic.
 
     Answer based on the context:`;
-
-    // 7. Generate answer with GPT-4o
-    this.logger.log('Generating answer with GPT-4o');
-    const response = await this.llm.invoke(prompt);
-    const answer = response.content as string;
-
-    this.logger.log('Answer generated successfully');
-
-    return {
-      answer,
-      citations,
-    };
-  }
-
-  // stream answer generation (for real-time responses)
-  async *streamAnswer(
-    question: string,
-    documentId: string,
-    topK: number = 5,
-  ): AsyncGenerator<string, void, unknown> {
-    // 1. Convert question to embedding
-    const questionEmbedding = await this.embeddingsService.embedText(question);
-
-    // 2. Search Pinecone for similar chunks
-    const similarChunks = await this.pineconeService.querySimilar(
-      questionEmbedding,
-      topK,
-      { documentId },
-    );
-
-    if (similarChunks.length === 0) {
-      yield "I couldn't find relevant information in the document to answer your question.";
-      return;
-    }
-
-    // 3. Build context
-    const context = similarChunks
-      .map((chunk, index) => {
-        const page = Number(chunk.metadata?.page) || 1;
-        const text = String(chunk.metadata?.text || '');
-        return `[Source ${index + 1}, Page ${page}]: ${text}`;
-      })
-      .join('\n\n');
-
-    // 4. Build prompt
-    const prompt = `Answer the following question using ONLY the information provided in the context below. If the context mentions the topic, provide an answer based on that information.
-
-    Context:
-    ${context}
-
-    Question: ${question}
-
-    Requirements:
-    - Answer the question using information from the context
-    - If the context mentions the topic, explain it based on what's provided
-    - Include page citations in format: (Page X)
-    - Only say "I couldn't find relevant information" if the topic is completely absent from the context
-
-    Answer:`;
-    // 5. Stream response from GPT-4o
-    const stream = await this.llm.stream(prompt);
-
-    for await (const chunk of stream) {
-      const content = chunk.content as string;
-      if (content) {
-        yield content;
-      }
-    }
   }
 }
