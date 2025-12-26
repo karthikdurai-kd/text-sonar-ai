@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { DocumentsModule } from './documents/documents.module';
 import { ProcessorsModule } from './processors/processors.module';
 import { ServicesModule } from './services/services.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ServicesModule } from './services/services.module';
     ServicesModule,
     DocumentsModule,
     ProcessorsModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
