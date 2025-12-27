@@ -1,3 +1,4 @@
+// app/documents/page.tsx
 "use client";
 
 import { useDocuments } from "@/hooks/useDocuments";
@@ -35,11 +36,16 @@ export default function DocumentsPage() {
   return (
     <PageContainer>
       <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold">Documents</h1>
-          {refreshing && (
-            <RefreshCw className="h-5 w-5 text-gray-400 animate-spin" />
-          )}
+        <div className="flex items-center">
+          <Button variant="ghost" asChild>
+            <Link href="/">←</Link>
+          </Button>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">Documents</h1>
+            {refreshing && (
+              <RefreshCw className="h-5 w-5 text-gray-400 animate-spin" />
+            )}
+          </div>
         </div>
         <Button asChild>
           <Link href="/upload">
