@@ -8,9 +8,6 @@ import {
   getChatsByDocument,
   askQuestion,
   getDocument,
-  type Chat,
-  type Message,
-  type Document,
 } from "@/lib/api";
 import { ChatHeader } from "@/components/features/chat/ChatHeader";
 import { MessageList } from "@/components/features/chat/MessageList";
@@ -20,7 +17,9 @@ import { PageContainer } from "@/components/common/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
+import { Chat, Message, Document } from "@/types";
 
 export default function ChatPage() {
   const params = useParams();
@@ -142,15 +141,15 @@ export default function ChatPage() {
   if (!document) return null;
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-background flex flex-col">
       <ChatHeader document={document} />
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-4xl mx-auto space-y-4">
-          {error && <ErrorAlert message={error} />}
+      <ScrollArea className="flex-1">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          {error && <ErrorAlert message={error} className="mb-4" />}
           <MessageList messages={messages} isLoading={sending} />
         </div>
-      </div>
+      </ScrollArea>
 
       <ChatInput
         onSend={handleSendQuestion}

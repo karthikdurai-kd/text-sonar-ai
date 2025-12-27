@@ -25,7 +25,7 @@ export function ChatHeader({ document }: ChatHeaderProps) {
                 {document.originalName}
               </h1>
               <p className="text-sm text-gray-500">
-                {document.totalPages} pages • {document.totalChunks} chunks
+                {document.totalPages} pages
               </p>
             </div>
           </div>

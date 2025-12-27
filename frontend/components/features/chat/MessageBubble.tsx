@@ -1,6 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Message } from "@/types";
 import { MarkdownRenderer } from "./MarkdownRenderer";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { User, Bot } from "lucide-react";
 
 interface MessageBubbleProps {
   message: Message;
@@ -10,23 +12,44 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <Card
-        className={`max-w-3xl ${
-          isUser ? "bg-blue-50 border-blue-200" : "bg-white"
-        }`}
+    <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
+      {/* Avatar */}
+      <Avatar className="h-8 w-8 shrink-0">
+        <AvatarFallback
+          className={cn(
+            isUser
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          )}
+        >
+          {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        </AvatarFallback>
+      </Avatar>
+
+      {/* Message Content */}
+      <div
+        className={cn(
+          "flex flex-col gap-1 max-w-[80%] sm:max-w-[75%]",
+          isUser ? "items-end" : "items-start"
+        )}
       >
-        <CardContent className="pt-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-1">
-              <p className="text-sm font-medium mb-1">
-                {isUser ? "You" : "Assistant"}
-              </p>
-              <MarkdownRenderer content={message.content} />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Name */}
+        <div className="text-xs text-muted-foreground px-1">
+          <span className="font-medium">{isUser ? "You" : "Assistant"}</span>
+        </div>
+
+        {/* Message Bubble*/}
+        <div
+          className={cn(
+            "rounded-2xl px-4 py-3 shadow-sm",
+            isUser
+              ? "bg-blue-500 text-white rounded-br-sm"
+              : "bg-card text-card-foreground border rounded-bl-sm"
+          )}
+        >
+          <MarkdownRenderer content={message.content} isUser={isUser} />
+        </div>
+      </div>
     </div>
   );
 }
