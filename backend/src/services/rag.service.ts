@@ -177,7 +177,7 @@ export class RagService {
       })
       .join('\n\n');
 
-    // 5. Extract citations with full text
+    // 5. Extract citations with full text [TODO: Match citation used by GPT-4o]
     const citations = similarChunks.map((pineconeChunk) => {
       const chunkId = String(pineconeChunk.metadata?.chunkId || '');
       const fullChunk = chunkId ? chunkMap.get(chunkId) : null;
