@@ -151,7 +151,7 @@ export default function DocumentsPage() {
                       </CardTitle>
                       <CardDescription className="mt-1">
                         {doc.totalPages > 0
-                          ? `${doc.totalPages} pages • ${doc.totalChunks} chunks`
+                          ? `${doc.totalPages} pages`
                           : "Processing..."}
                       </CardDescription>
                     </div>

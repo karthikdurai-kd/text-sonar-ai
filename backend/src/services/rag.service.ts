@@ -164,16 +164,16 @@ export class RagService {
     // Create a map for quick lookup
     const chunkMap = new Map(fullChunks.map((chunk) => [chunk.id, chunk]));
 
-    // 4. Build context with FULL text from database
+    // 4. Build context with FULL text from database (page numbers)
     const context = similarChunks
-      .map((pineconeChunk, index) => {
+      .map((pineconeChunk) => {
         const chunkId = String(pineconeChunk.metadata?.chunkId || '');
         const fullChunk = chunkId ? chunkMap.get(chunkId) : null;
         const page = Number(pineconeChunk.metadata?.page) || 1;
         const text =
           fullChunk?.text || String(pineconeChunk.metadata?.text || '');
 
-        return `[Source ${index + 1}, Page ${page}]: ${text}`;
+        return `[Page ${page}]: ${text}`;
       })
       .join('\n\n');
 
@@ -208,10 +208,11 @@ export class RagService {
     1. ALWAYS provide an answer if the context contains ANY information related to the question, even if it's brief.
     2. Use the information from the context above to answer the question.
     3. If the context mentions the topic (even briefly), explain it based on what's provided.
-    4. Cite the page number(s) where you found the information using format: (Page X)
-    5. If you reference multiple sources, cite each one: (Page X, Page Y)
-    6. Be comprehensive and accurate based on the context.
-    7. ONLY say "I couldn't find relevant information" if the context contains ZERO mention of the topic.
+    4. Cite ONLY page numbers in your answer using format: (Page X)
+    5. If you reference information from multiple pages, cite them like: (Page X, Page Y)
+    6. DO NOT mention "Source 1", "Source 2", "Source X" - only use page numbers.
+    7. Be comprehensive and accurate based on the context.
+    8. ONLY say "I couldn't find relevant information" if the context contains ZERO mention of the topic.
 
     Answer based on the context:`;
   }

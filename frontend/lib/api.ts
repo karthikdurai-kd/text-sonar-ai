@@ -123,4 +123,23 @@ export async function askQuestion(
   return response.data;
 }
 
+// Get or create chat for a document
+export async function getOrCreateChat(documentId: string): Promise<Chat> {
+  try {
+    // Get existing chats
+    const chats = await getChatsByDocument(documentId);
+    if (chats.length > 0) {
+      // Get the most recent chat with messages
+      const chatWithMessages = await getChat(chats[0].id);
+      return chatWithMessages;
+    }
+  } catch (error) {
+    // If no chats exist, create one
+    console.error("Error getting chats:", error);
+  }
+
+  // Create new chat
+  return await createChat(documentId);
+}
+
 export default api;
