@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { Chat, Document, QuestionResponse } from "@/types";
 // API base URL
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
@@ -11,47 +11,6 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-// Types
-export interface Document {
-  id: string;
-  filename: string;
-  originalName: string;
-  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
-  totalPages: number;
-  totalChunks: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Chat {
-  id: string;
-  documentId: string;
-  title: string | null;
-  createdAt: string;
-  messages?: Message[];
-}
-
-export interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  citations?: Array<{
-    page: number;
-    text: string;
-    score?: number;
-  }>;
-  createdAt: string;
-}
-
-export interface QuestionResponse {
-  answer: string;
-  citations: Array<{
-    page: number;
-    text: string;
-    score?: number;
-  }>;
-}
 
 // API Functions
 
