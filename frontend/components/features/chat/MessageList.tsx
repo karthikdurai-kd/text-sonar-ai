@@ -14,8 +14,8 @@ function TypingIndicator() {
   return (
     <div className="flex gap-3">
       <Avatar className="h-8 w-8 shrink-0">
-        <AvatarFallback className="bg-gray-200 dark:bg-gray-700">
-          <Sparkles className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+        <AvatarFallback className="bg-muted">
+          <Sparkles className="h-4 w-4 text-muted-foreground" />
         </AvatarFallback>
       </Avatar>
       <div className="flex flex-col gap-1">
@@ -52,22 +52,31 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
 
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[400px]">
-        <Card className="border-dashed">
-          <CardContent className="pt-6 text-center max-w-md">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-                <MessageSquare className="w-8 h-8 text-blue-500" />
+      <div className="flex items-center justify-center py-12">
+        <Card className="border-dashed w-full max-w-lg">
+          <CardContent className="pt-8 pb-8 text-center">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <MessageSquare className="w-10 h-10 text-primary" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold mb-2">Start a conversation</h3>
-            <CardDescription className="mb-4">
+            <h3 className="text-xl font-semibold mb-3">Start a conversation</h3>
+            <CardDescription className="mb-6 text-base">
               Ask a question about this document to get started.
             </CardDescription>
-            <div className="text-sm text-muted-foreground space-y-1">
-              <p className="font-medium">Try asking:</p>
-              <p>&quot;What is the main topic of this document?&quot;</p>
-              <p>&quot;Summarize the key points&quot;</p>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p className="font-medium text-foreground mb-3">Try asking:</p>
+              <div className="space-y-2">
+                <p className="bg-muted/50 rounded-lg py-2 px-4">
+                  &quot;What is the main topic of this document?&quot;
+                </p>
+                <p className="bg-muted/50 rounded-lg py-2 px-4">
+                  &quot;Summarize the key points&quot;
+                </p>
+                <p className="bg-muted/50 rounded-lg py-2 px-4">
+                  &quot;Explain the main concepts&quot;
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

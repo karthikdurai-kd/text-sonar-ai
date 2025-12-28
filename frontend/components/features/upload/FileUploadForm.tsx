@@ -64,8 +64,8 @@ export function FileUploadForm({ onUpload, isUploading }: FileUploadFormProps) {
         />
 
         {file && (
-          <div className="p-3 bg-gray-50 rounded-md">
-            <p className="text-sm">
+          <div className="p-3 bg-muted rounded-md">
+            <p className="text-sm text-foreground">
               <strong>Selected:</strong> {file.name} (
               {(file.size / 1024 / 1024).toFixed(2)} MB)
             </p>

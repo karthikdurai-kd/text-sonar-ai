@@ -148,17 +148,26 @@ export default function ChatPage() {
   if (!document) return null;
 
   return (
-    <>
+    <div className="h-screen flex flex-col overflow-hidden">
       <Navigation />
-      <main className="min-h-screen bg-background flex flex-col">
+      <main className="flex-1 bg-background flex flex-col overflow-hidden">
         <ChatHeader document={document} />
 
-        <ScrollArea className="flex-1">
-          <div className="max-w-4xl mx-auto px-4 py-6">
-            {error && <ErrorAlert message={error} className="mb-4" />}
-            <MessageList messages={messages} isLoading={sending} />
+        {messages.length > 0 ? (
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-4xl mx-auto px-4 py-6">
+              {error && <ErrorAlert message={error} className="mb-4" />}
+              <MessageList messages={messages} isLoading={sending} />
+            </div>
           </div>
-        </ScrollArea>
+        ) : (
+          <div className="flex-1 flex items-center justify-center overflow-hidden">
+            <div className="max-w-4xl w-full px-4">
+              {error && <ErrorAlert message={error} className="mb-4" />}
+              <MessageList messages={messages} isLoading={sending} />
+            </div>
+          </div>
+        )}
 
         <ChatInput
           onSend={handleSendQuestion}
@@ -166,6 +175,6 @@ export default function ChatPage() {
           isLoading={sending}
         />
       </main>
-    </>
+    </div>
   );
 }

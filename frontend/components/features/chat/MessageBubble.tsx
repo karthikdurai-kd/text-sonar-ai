@@ -12,7 +12,12 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
+    <div
+      className={cn(
+        "flex gap-3",
+        isUser ? "flex-row-reverse items-center" : "flex-row items-start"
+      )}
+    >
       <Avatar className="h-8 w-8 shrink-0">
         <AvatarFallback
           className={cn(
@@ -25,13 +30,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
       <div
         className={cn(
-          "flex flex-col gap-1 max-w-[80%] sm:max-w-[75%]",
-          isUser ? "items-end" : "items-start"
+          "flex flex-col max-w-[80%] sm:max-w-[75%]",
+          isUser ? "items-end" : "items-start gap-1"
         )}
       >
-        <div className="text-xs text-muted-foreground px-1">
-          <span className="font-medium">{isUser ? "You" : "Assistant"}</span>
-        </div>
+        {!isUser && (
+          <div className="text-xs text-muted-foreground px-1">
+            <span className="font-medium">Assistant</span>
+          </div>
+        )}
 
         <div
           className={cn(
