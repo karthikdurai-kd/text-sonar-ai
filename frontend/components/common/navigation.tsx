@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FileText, Upload } from "lucide-react";
+import { Radar, Upload, FileText } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -15,7 +15,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <FileText className="h-6 w-6" />
+              <Radar className="h-6 w-6 text-primary" />
               <span className="font-bold text-xl">TextSonar AI</span>
             </Link>
           </div>

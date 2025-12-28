@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TextSonar AI",
   description: "Upload PDFs and ask questions with AI-powered answers.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
