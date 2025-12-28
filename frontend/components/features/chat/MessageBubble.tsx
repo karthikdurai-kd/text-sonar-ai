@@ -13,32 +13,26 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
   return (
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
-      {/* Avatar */}
       <Avatar className="h-8 w-8 shrink-0">
         <AvatarFallback
           className={cn(
-            isUser
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+            isUser ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"
           )}
         >
           {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
         </AvatarFallback>
       </Avatar>
 
-      {/* Message Content */}
       <div
         className={cn(
           "flex flex-col gap-1 max-w-[80%] sm:max-w-[75%]",
           isUser ? "items-end" : "items-start"
         )}
       >
-        {/* Name */}
         <div className="text-xs text-muted-foreground px-1">
           <span className="font-medium">{isUser ? "You" : "Assistant"}</span>
         </div>
 
-        {/* Message Bubble*/}
         <div
           className={cn(
             "rounded-2xl px-4 py-3 shadow-sm",

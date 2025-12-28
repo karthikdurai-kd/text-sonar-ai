@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { uploadDocument } from "@/lib/api";
 import { PageContainer } from "@/components/common/PageContainer";
 import { FileUploadForm } from "@/components/features/upload/FileUploadForm";
+import { Navigation } from "@/components/common/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -23,14 +24,17 @@ export default function UploadPage() {
   };
 
   return (
-    <PageContainer maxWidth="2xl">
-      <h1 className="text-3xl font-bold mb-6">Upload PDF</h1>
-      <FileUploadForm onUpload={handleUpload} isUploading={uploading} />
-      <div className="mt-4">
-        <Button variant="ghost" asChild>
-          <Link href="/">← Back to Home</Link>
-        </Button>
-      </div>
-    </PageContainer>
+    <>
+      <Navigation />
+      <PageContainer maxWidth="2xl">
+        <h1 className="text-3xl font-bold mb-6">Upload PDF</h1>
+        <FileUploadForm onUpload={handleUpload} isUploading={uploading} />
+        <div className="mt-4">
+          <Button variant="ghost" asChild>
+            <Link href="/">← Back to Home</Link>
+          </Button>
+        </div>
+      </PageContainer>
+    </>
   );
 }

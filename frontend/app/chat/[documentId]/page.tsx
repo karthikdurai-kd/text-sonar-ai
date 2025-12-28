@@ -14,6 +14,7 @@ import { MessageList } from "@/components/features/chat/MessageList";
 import { ChatInput } from "@/components/features/chat/ChatInput";
 import { ErrorAlert } from "@/components/common/ErrorAlert";
 import { PageContainer } from "@/components/common/PageContainer";
+import { Navigation } from "@/components/common/navigation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -116,46 +117,55 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <PageContainer>
-        <Skeleton className="h-8 w-48 mb-6" />
-        <Card>
-          <CardContent className="pt-6">
-            <Skeleton className="h-32 w-full" />
-          </CardContent>
-        </Card>
-      </PageContainer>
+      <>
+        <Navigation />
+        <PageContainer>
+          <Skeleton className="h-8 w-48 mb-6" />
+          <Card>
+            <CardContent className="pt-6">
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
+        </PageContainer>
+      </>
     );
   }
 
   if (error && !document) {
     return (
-      <PageContainer>
-        <ErrorAlert message={error} />
-        <Button variant="outline" className="mt-4" asChild>
-          <Link href="/documents">← Back to Documents</Link>
-        </Button>
-      </PageContainer>
+      <>
+        <Navigation />
+        <PageContainer>
+          <ErrorAlert message={error} />
+          <Button variant="outline" className="mt-4" asChild>
+            <Link href="/documents">← Back to Documents</Link>
+          </Button>
+        </PageContainer>
+      </>
     );
   }
 
   if (!document) return null;
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
-      <ChatHeader document={document} />
+    <>
+      <Navigation />
+      <main className="min-h-screen bg-background flex flex-col">
+        <ChatHeader document={document} />
 
-      <ScrollArea className="flex-1">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          {error && <ErrorAlert message={error} className="mb-4" />}
-          <MessageList messages={messages} isLoading={sending} />
-        </div>
-      </ScrollArea>
+        <ScrollArea className="flex-1">
+          <div className="max-w-4xl mx-auto px-4 py-6">
+            {error && <ErrorAlert message={error} className="mb-4" />}
+            <MessageList messages={messages} isLoading={sending} />
+          </div>
+        </ScrollArea>
 
-      <ChatInput
-        onSend={handleSendQuestion}
-        disabled={document.status !== "COMPLETED"}
-        isLoading={sending}
-      />
-    </main>
+        <ChatInput
+          onSend={handleSendQuestion}
+          disabled={document.status !== "COMPLETED"}
+          isLoading={sending}
+        />
+      </main>
+    </>
   );
 }

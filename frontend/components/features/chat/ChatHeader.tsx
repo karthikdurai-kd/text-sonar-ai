@@ -9,7 +9,7 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ document }: ChatHeaderProps) {
   return (
-    <div className="bg-white border-b p-4">
+    <div className="bg-card border-b p-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -24,8 +24,8 @@ export function ChatHeader({ document }: ChatHeaderProps) {
                 <FileText className="h-5 w-5" />
                 {document.originalName}
               </h1>
-              <p className="text-sm text-gray-500">
-                {document.totalPages} pages
+              <p className="text-sm text-muted-foreground">
+                {document.totalPages} pages • {document.totalChunks} chunks
               </p>
             </div>
           </div>

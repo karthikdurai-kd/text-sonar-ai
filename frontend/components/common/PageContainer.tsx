@@ -1,3 +1,4 @@
+// components/common/PageContainer.tsx
 import { ReactNode } from "react";
 
 interface PageContainerProps {
@@ -21,7 +22,7 @@ export function PageContainer({
   className = "",
 }: PageContainerProps) {
   return (
-    <main className={`min-h-screen p-8 bg-gray-50 ${className}`}>
+    <main className={`min-h-screen p-8 bg-background ${className}`}>
       <div className={`${maxWidthClasses[maxWidth]} mx-auto`}>{children}</div>
     </main>
   );
