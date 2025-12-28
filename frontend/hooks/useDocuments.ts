@@ -1,6 +1,6 @@
-// hooks/useDocuments.ts
 import { useState, useEffect } from "react";
-import { getDocuments, Document } from "@/lib/api";
+import { getDocuments } from "@/lib/api";
+import { Document } from "@/types";
 
 export function useDocuments() {
   const [documents, setDocuments] = useState<Document[]>([]);
