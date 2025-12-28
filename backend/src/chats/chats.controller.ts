@@ -15,7 +15,7 @@ import { Chat } from 'src/entities/chat.entity';
 export class ChatsController {
   constructor(private readonly chatsService: ChatsService) {}
 
-  // create a new chat for a document
+  // POST /chats - create a new chat for a document
   @Post()
   async createChat(
     @Body() body: { documentId: string; title?: string },
@@ -27,19 +27,19 @@ export class ChatsController {
     return { chat };
   }
 
-  // get chat by ID with messages
+  // GET /chats/:id - get chat by ID with messages
   @Get(':id')
   async getChat(@Param('id') id: string) {
     return await this.chatsService.getChat(id);
   }
 
-  // get all chats for a document
+  // GET /chats/document/:documentId - get all chats for a document
   @Get('document/:documentId')
   async getChatsByDocument(@Param('documentId') documentId: string) {
     return await this.chatsService.getChatsByDocument(documentId);
   }
 
-  // ask a question (non-streaming)
+  // POST /chats/:id/messages - ask a question
   @Post(':id/messages')
   async askQuestion(
     @Param('id') chatId: string,
@@ -55,7 +55,7 @@ export class ChatsController {
     };
   }
 
-  // stream answer (Server-Sent Events)
+  // POST /chats/:id/stream - stream answer
   @Post(':id/stream')
   @Sse()
   streamAnswer(

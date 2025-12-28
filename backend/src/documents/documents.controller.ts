@@ -16,6 +16,7 @@ import { DocumentsService } from './documents.service';
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
+  // POST /documents/upload - upload a PDF file
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
@@ -41,12 +42,14 @@ export class DocumentsController {
     };
   }
 
+  // GET /documents - get all documents
   @Get()
   async getAllDocuments() {
     const documents = await this.documentsService.findAll();
     return documents;
   }
 
+  // GET /documents/:id - get a document by ID
   @Get(':id')
   async getDocument(@Param('id') id: string) {
     const document = await this.documentsService.findOne(id);
