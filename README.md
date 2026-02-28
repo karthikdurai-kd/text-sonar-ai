@@ -90,7 +90,7 @@ Retrieve full chunk text from PostgreSQL
     ↓
 Build context with page numbers
     ↓
-Send to GPT-4o with context
+Send to GPT-4.1 with context
     ↓
 Extract citations from answer
     ↓
