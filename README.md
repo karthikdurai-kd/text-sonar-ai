@@ -8,7 +8,7 @@
 | :--------------------------- | :------------------------------------------------------------------------------- |
 | **PDF Upload & Processing**  | Upload PDF documents with automatic background processing                        |
 | **Semantic Search**          | Vector-based semantic search using Pinecone for finding relevant document chunks |
-| **AI-Powered Q&A**           | Get accurate answers from your documents using GPT-4o                            |
+| **AI-Powered Q&A**           | Get accurate answers from your documents using GPT-4.1                           |
 | **Source Citations**         | Answers include page number citations                                            |
 | **Asynchronous Processing**  | Non-blocking PDF processing using BullMQ and Redis                               |
 | **Real-time Status Updates** | Track document processing status in real-time                                    |
@@ -25,7 +25,7 @@
 
 1. **Upload**: User uploads PDF → Backend saves file → Adds job to queue
 2. **Processing**: Worker extracts text → Splits into chunks → Generates embeddings → Stores in Pinecone
-3. **Query**: User asks question → Backend generates question embedding → Searches Pinecone → Retrieves relevant chunks → GPT-4o generates answer with citations
+3. **Query**: User asks question → Backend generates question embedding → Searches Pinecone → Retrieves relevant chunks → GPT-4.1 generates answer with citations
 
 ## 🛠️ Tech Stack
 
